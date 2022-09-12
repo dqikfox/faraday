@@ -1,31 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Rocker : MonoBehaviour
 {
-    // Public members set in Unity Object Inspector
-    public AudioSource audioSource1;
-
     private bool cooldownActive = false;
 
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
-    }
-
-    IEnumerator PlaySound(AudioSource source, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        source.Stop();
-        source.Play();
-    }
+    void Start() { }
+    void Update() { }
 
     void OnTriggerEnter(Collider other)
     {
@@ -38,12 +18,10 @@ public class Rocker : MonoBehaviour
             {
                 script.Toggle();
 
-                // Set the blade to the proper position by rotating the pivot
+                // Set the rocker to the proper position by rotating the pivot
                 var rotation = transform.localEulerAngles;
                 rotation.y = -rotation.y;
                 transform.localEulerAngles = rotation;
-
-                StartCoroutine(PlaySound(audioSource1, 0f));
 
                 cooldownActive = true;
                 Invoke("Cooldown", 0.5f);

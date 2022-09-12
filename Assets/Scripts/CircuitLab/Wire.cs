@@ -64,7 +64,8 @@ public class Wire : CircuitComponent
             }
 
             // Show/hide the labels
-            bool showLabels = Lab.showLabels && IsActive && !IsShortCircuit;
+            bool sufficientCurrent = (Current > 0.0000001);
+            bool showLabels = Lab.showLabels && IsActive && sufficientCurrent && !IsShortCircuit;
             labelVoltage.gameObject.SetActive(showLabels);
             labelCurrent.gameObject.SetActive(showLabels);
         }
@@ -149,10 +150,6 @@ public class Wire : CircuitComponent
 
             // Change electrons to red
             SetElectronColor(shortEmissionColor, shortBaseColor);
-
-            // Hide the labels
-            labelVoltage.gameObject.SetActive(false);
-            labelCurrent.gameObject.SetActive(false);
         }
     }
 
@@ -161,7 +158,7 @@ public class Wire : CircuitComponent
         Voltage = voltage;
 
         // Update label text
-        labelVoltageText.text = voltage.ToString("0.##") + "V";
+        labelVoltageText.text = voltage.ToString("0.#") + "V";
     }
 
     public override void SetCurrent(double current)
@@ -174,15 +171,11 @@ public class Wire : CircuitComponent
         {
             IsActive = false;
             DeactivateElectrons();
-
-            // Hide the labels
-            labelVoltage.gameObject.SetActive(false);
-            labelCurrent.gameObject.SetActive(false);
         }
         else
         {
             // Update label text
-            labelCurrentText.text = (current * 1000f).ToString("0.##") + "mA";
+            labelCurrentText.text = (current * 1000f).ToString("0.#") + "mA";
 
             // Update electron speed
             speed = normalCircuitSpeed * ((float)current / baseCurrent);
