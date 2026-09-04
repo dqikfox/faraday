@@ -11,6 +11,7 @@ namespace RealityEngine.Visualization
     /// Senedjemib Inti (G 2370) elite mastaba complex in the NW West Field (Lehner schematic),
     /// Ankhhaf (G 7510) elite mastaba in the East Field (Lehner schematic),
     /// Debehen rock-cut tomb in the Central Field (Lehner schematic),
+    /// Hetepheres I (G 7000X) deep shaft tomb east of Khufu near SE / G1a (Reisner / Lehner schematic),
     /// Menkaure quarry / ramp remnants schematic SW of Menkaure,
     /// Khentkawes I (LG100) rock-cut stepped tomb SE of Central Field / NE of Menkaure,
     /// GizaSurveyAnomalies OFF-by-default speculative thermal/GPR solids,
@@ -35,6 +36,7 @@ namespace RealityEngine.Visualization
         public const string HemiunuName = "Hemiunu";
         public const string SenedjemibName = "Senedjemib";
         public const string AnkhhafName = "Ankhhaf";
+        public const string HetepheresName = "Hetepheres";
         public const string DebehenName = "Debehen";
         public const string MenkaureQuarryName = "MenkaureQuarry";
         public const string SurveyAnomaliesName = "GizaSurveyAnomalies";
@@ -112,6 +114,14 @@ namespace RealityEngine.Visualization
         public const float AnkhhafChapelEW = 11f;
         public const float AnkhhafChapelNS = 7.5f;
         public const float AnkhhafChapelHM = 4.6f;
+
+        // Hetepheres I (G 7000X): SE of Khufu, between east face and queens G1a (Reisner / Lehner).
+        // Vertical rock-cut shaft ~2.1-2.5 m square, ~27 m deep; empty alabaster sarcophagus chamber.
+        public const float HetepheresEastPastHalfM = 34f;
+        public const float HetepheresNorthFracOfBase = -0.30f;
+        public const float HetepheresShaftWidthM = 2.3f;
+        public const float HetepheresShaftDepthM = 27f;
+        public const float HetepheresShaftWallT = 0.45f;
 
         // Debehen: Central Field rock-cut elite tomb (Lehner schematic massing).
         public const float DebehenEastFrac = 0.62f;
@@ -215,6 +225,10 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, aEast, aNorth,
                 AnkhhafBodyEW * 0.5f + AnkhhafChapelEW + 16f, AnkhhafBodyNS * 0.5f + 12f);
 
+            LayoutHetepheres(out float hetEast, out float hetNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, hetEast, hetNorth,
+                HetepheresShaftWidthM * 0.5f + 12f, HetepheresShaftWidthM * 0.5f + 12f);
+
             LayoutDebehen(out float dEast, out float dNorth);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, dEast, dNorth,
                 DebehenBodyEW * 0.5f + DebehenCourtEW + DebehenChapelEW + 14f, DebehenBodyNS * 0.5f + 12f);
@@ -247,8 +261,8 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, kEast, kNorth,
                 KhentkawesPodiumM * 0.5f + 16f, KhentkawesPodiumM * 0.5f + KhentkawesBasinNS + 14f);
 
-            LayoutShaft(out float sEast, out float sNorth);
-            Enc(ref xMin, ref xMax, ref zMin, ref zMax, sEast, sNorth, ShaftWidthM * 0.5f + 10f, ShaftWidthM * 0.5f + 10f);
+            LayoutShaft(out float shEast, out float shNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, shEast, shNorth, ShaftWidthM * 0.5f + 10f, ShaftWidthM * 0.5f + 10f);
         }
 
         static void Enc(ref float xMin, ref float xMax, ref float zMin, ref float zMax,
@@ -271,6 +285,7 @@ namespace RealityEngine.Visualization
             DestroyNamed(GizaComplex.FindNamed(HemiunuName));
             DestroyNamed(GizaComplex.FindNamed(SenedjemibName));
             DestroyNamed(GizaComplex.FindNamed(AnkhhafName));
+            DestroyNamed(GizaComplex.FindNamed(HetepheresName));
             DestroyNamed(GizaComplex.FindNamed(DebehenName));
             DestroyNamed(GizaComplex.FindNamed(MenkaureQuarryName));
             DestroyNamed(GizaComplex.FindNamed(SurveyAnomaliesName));
@@ -322,6 +337,14 @@ namespace RealityEngine.Visualization
             if (old != null && old.transform.Find(AnkhhafName + MassingMarker) == null)
                 DestroyNamed(old);
             Ensure(AnkhhafName, pose, BuildAnkhhaf, pose.surfaceY, true);
+        }
+
+        public static void EnsureHetepheres(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(HetepheresName);
+            if (old != null && old.transform.Find(HetepheresName + MassingMarker) == null)
+                DestroyNamed(old);
+            Ensure(HetepheresName, pose, BuildHetepheres, pose.surfaceY, true);
         }
 
         public static void EnsureDebehen(GizaComplex.Pose pose)
@@ -477,6 +500,15 @@ namespace RealityEngine.Visualization
             // Northern East Field elite mastaba G7510 (Lehner schematic).
             east = east0 + AnkhhafWestInsetFromEastWestEdgeM + AnkhhafBodyEW * 0.5f;
             north = north0 + (north1 - north0) * AnkhhafNorthFrac;
+        }
+
+        static void LayoutHetepheres(out float east, out float north)
+        {
+            // SE of Khufu: east of east face / pavement apron, west of queens G1a and East Field grid.
+            // Avoid G1d (further SE corner) and Ankhhaf (farther east in East Field).
+            float khHalf = KhufuPyramid.BaseMeters * 0.5f;
+            east = khHalf + HetepheresEastPastHalfM;
+            north = KhufuPyramid.BaseMeters * HetepheresNorthFracOfBase;
         }
 
         static void LayoutDebehen(out float east, out float north)
@@ -1718,19 +1750,19 @@ namespace RealityEngine.Visualization
             float basinZ = -(half + basinNS * 0.5f + 2.5f);
             var basin = new LabMeshBuilder(48, 72);
             // Hollow recessed basin: floor at bottom + four rock walls (open interior).
-            float wallT = 0.7f;
+            float basinWallT = 0.7f;
             float floorT = 0.35f;
             basin.AddBox(new Vector3(0f, -basinD + floorT * 0.5f, basinZ),
-                new Vector3(basinEW - wallT * 2f, floorT, basinNS - wallT * 2f), Color.white);
+                new Vector3(basinEW - basinWallT * 2f, floorT, basinNS - basinWallT * 2f), Color.white);
             float wy = -basinD * 0.5f;
-            basin.AddBox(new Vector3(0f, wy, basinZ + basinNS * 0.5f - wallT * 0.5f),
-                new Vector3(basinEW, basinD, wallT), Color.white);
-            basin.AddBox(new Vector3(0f, wy, basinZ - (basinNS * 0.5f - wallT * 0.5f)),
-                new Vector3(basinEW, basinD, wallT), Color.white);
-            basin.AddBox(new Vector3(basinEW * 0.5f - wallT * 0.5f, wy, basinZ),
-                new Vector3(wallT, basinD, basinNS - wallT * 2f), Color.white);
-            basin.AddBox(new Vector3(-(basinEW * 0.5f - wallT * 0.5f), wy, basinZ),
-                new Vector3(wallT, basinD, basinNS - wallT * 2f), Color.white);
+            basin.AddBox(new Vector3(0f, wy, basinZ + basinNS * 0.5f - basinWallT * 0.5f),
+                new Vector3(basinEW, basinD, basinWallT), Color.white);
+            basin.AddBox(new Vector3(0f, wy, basinZ - (basinNS * 0.5f - basinWallT * 0.5f)),
+                new Vector3(basinEW, basinD, basinWallT), Color.white);
+            basin.AddBox(new Vector3(basinEW * 0.5f - basinWallT * 0.5f, wy, basinZ),
+                new Vector3(basinWallT, basinD, basinNS - basinWallT * 2f), Color.white);
+            basin.AddBox(new Vector3(-(basinEW * 0.5f - basinWallT * 0.5f), wy, basinZ),
+                new Vector3(basinWallT, basinD, basinNS - basinWallT * 2f), Color.white);
             // Surface rim.
             float rimT = 0.7f;
             float rimH = 0.55f;
@@ -2137,6 +2169,138 @@ namespace RealityEngine.Visualization
                 crowPlate.localPosition = new Vector3(len * 0.28f, 2.1f, wallZ + t * 0.5f + 1.2f);
                 crowPlate.localRotation = Quaternion.Euler(0f, 0f, 0f);
             }
+        }
+
+
+        static GameObject BuildHetepheres(GizaComplex.Pose pose)
+        {
+            LayoutHetepheres(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(HetepheresName, pose.parent, world, pose.rot);
+            Material rock = GizaBuild.CliffRock();
+            Material lime = GizaBuild.InteriorLime();
+            Material tura = GizaBuild.TuraCasing();
+            Material pav = GizaBuild.Pavement();
+            Material sand = GizaBuild.DesertSand();
+
+            float w = HetepheresShaftWidthM;
+            float depth = HetepheresShaftDepthM;
+            float wallT = HetepheresShaftWallT;
+            float hw = w * 0.5f;
+            float inner = w - wallT * 2f;
+
+            // Sand apron ring + pavement collar (leave shaft mouth open / walkable).
+            var apron = new LabMeshBuilder(32, 48);
+            float apronPad = 4.5f;
+            float outer = hw + apronPad;
+            float sandT = apronPad - 2.2f;
+            apron.AddBox(new Vector3(0f, 0.05f, outer - sandT * 0.5f), new Vector3(outer * 2f, 0.1f, sandT), Color.white);
+            apron.AddBox(new Vector3(0f, 0.05f, -(outer - sandT * 0.5f)), new Vector3(outer * 2f, 0.1f, sandT), Color.white);
+            apron.AddBox(new Vector3(outer - sandT * 0.5f, 0.05f, 0f), new Vector3(sandT, 0.1f, (outer - sandT) * 2f), Color.white);
+            apron.AddBox(new Vector3(-(outer - sandT * 0.5f), 0.05f, 0f), new Vector3(sandT, 0.1f, (outer - sandT) * 2f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HetepheresName + "_Apron",
+                apron.Build(HetepheresName + "_Apron"), sand, true);
+            var apronRing = new LabMeshBuilder(32, 48);
+            float pad = 2.2f;
+            apronRing.AddBox(new Vector3(0f, 0.1f, hw + pad * 0.5f + 0.12f), new Vector3(w + pad * 2f, 0.14f, pad), Color.white);
+            apronRing.AddBox(new Vector3(0f, 0.1f, -(hw + pad * 0.5f + 0.12f)), new Vector3(w + pad * 2f, 0.14f, pad), Color.white);
+            apronRing.AddBox(new Vector3(hw + pad * 0.5f + 0.12f, 0.1f, 0f), new Vector3(pad, 0.14f, w), Color.white);
+            apronRing.AddBox(new Vector3(-(hw + pad * 0.5f + 0.12f), 0.1f, 0f), new Vector3(pad, 0.14f, w), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HetepheresName + "_PavRing",
+                apronRing.Build(HetepheresName + "_PavRing"), pav, true);
+
+            // Limestone collar / rim around shaft mouth (open, walkable).
+            var rim = new LabMeshBuilder(48, 72);
+            float rimH = 0.85f;
+            float rimOut = hw + 1.8f;
+            rim.AddBox(new Vector3(0f, rimH * 0.5f, rimOut - 0.35f), new Vector3(rimOut * 2f, rimH, 0.7f), Color.white);
+            rim.AddBox(new Vector3(0f, rimH * 0.5f, -(rimOut - 0.35f)), new Vector3(rimOut * 2f, rimH, 0.7f), Color.white);
+            rim.AddBox(new Vector3(rimOut - 0.35f, rimH * 0.5f, 0f), new Vector3(0.7f, rimH, rimOut * 2f - 1.4f), Color.white);
+            rim.AddBox(new Vector3(-(rimOut - 0.35f), rimH * 0.5f, 0f), new Vector3(0.7f, rimH, rimOut * 2f - 1.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HetepheresName + "_Rim", rim.Build(HetepheresName + "_Rim"), rock, true);
+
+            // Four rock-cut shaft walls (~2.3 m square, ~27 m deep - Reisner).
+            var shaft = new LabMeshBuilder(64, 96);
+            float wallH = depth;
+            float wy = -wallH * 0.5f;
+            shaft.AddBox(new Vector3(0f, wy, hw - wallT * 0.5f), new Vector3(w, wallH, wallT), Color.white);
+            shaft.AddBox(new Vector3(0f, wy, -(hw - wallT * 0.5f)), new Vector3(w, wallH, wallT), Color.white);
+            shaft.AddBox(new Vector3(hw - wallT * 0.5f, wy, 0f), new Vector3(wallT, wallH, w - wallT * 2f), Color.white);
+            shaft.AddBox(new Vector3(-(hw - wallT * 0.5f), wy, 0f), new Vector3(wallT, wallH, w - wallT * 2f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HetepheresName + ShaftMarker,
+                shaft.Build(HetepheresName + ShaftMarker), rock, true);
+
+            // Modest mid ledge ticks (not a full stair run - mesh budget).
+            float midY = -depth * 0.5f;
+            var ledge = new LabMeshBuilder(16, 24);
+            float ledgeT = 0.28f;
+            float ledgeD = 0.55f;
+            ledge.AddBox(new Vector3(0f, midY, hw - wallT - ledgeD * 0.5f),
+                new Vector3(inner * 0.85f, ledgeT, ledgeD), Color.white);
+            ledge.AddBox(new Vector3(0f, midY * 0.5f, hw - wallT - ledgeD * 0.5f),
+                new Vector3(inner * 0.7f, ledgeT, ledgeD * 0.85f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HetepheresName + "_Ledges",
+                ledge.Build(HetepheresName + "_Ledges"), lime, true);
+
+            // Bottom chamber schematic: floor + empty alabaster sarcophagus block + small niche alcove.
+            float botY = -depth + 0.15f;
+            var bottom = new LabMeshBuilder(64, 96);
+            float chamberEW = Mathf.Max(inner + 1.6f, 3.6f);
+            float chamberNS = Mathf.Max(inner + 2.2f, 4.2f);
+            float chamberH = 2.4f;
+            bottom.AddBox(new Vector3(0f, botY, 0f), new Vector3(chamberEW, 0.35f, chamberNS), Color.white);
+            float chWallT = 0.4f;
+            float chWy = botY + 0.35f + chamberH * 0.5f;
+            bottom.AddBox(new Vector3(0f, chWy, chamberNS * 0.5f - chWallT * 0.5f),
+                new Vector3(chamberEW, chamberH, chWallT), Color.white);
+            bottom.AddBox(new Vector3(0f, chWy, -(chamberNS * 0.5f - chWallT * 0.5f)),
+                new Vector3(chamberEW, chamberH, chWallT), Color.white);
+            bottom.AddBox(new Vector3(chamberEW * 0.5f - chWallT * 0.5f, chWy, 0f),
+                new Vector3(chWallT, chamberH, chamberNS - chWallT * 2f), Color.white);
+            bottom.AddBox(new Vector3(-(chamberEW * 0.5f - chWallT * 0.5f), chWy, 0f),
+                new Vector3(chWallT, chamberH, chamberNS - chWallT * 2f), Color.white);
+            // Empty alabaster sarcophagus block (Reisner find schematic - not photogrammetry).
+            float sarcEW = 2.15f;
+            float sarcNS = 0.95f;
+            float sarcH = 0.95f;
+            bottom.AddBox(new Vector3(0f, botY + 0.35f + sarcH * 0.5f, 0.15f),
+                new Vector3(sarcEW, sarcH, sarcNS), Color.white);
+            float nicheD = 0.9f;
+            float nicheW = 1.1f;
+            float nicheH = 1.35f;
+            bottom.AddBox(new Vector3(0f, botY + 0.35f + nicheH * 0.5f, -(chamberNS * 0.5f - chWallT - nicheD * 0.35f)),
+                new Vector3(nicheW, nicheH, nicheD), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HetepheresName + "_BottomChamber",
+                bottom.Build(HetepheresName + "_BottomChamber"), tura, true);
+
+            // Massing marker for Ensure force-rebuild (same pattern as Ankhhaf / Hemiunu).
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.02f, 0f), new Vector3(0.4f, 0.04f, 0.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HetepheresName + MassingMarker,
+                mark.Build(HetepheresName + MassingMarker), pav, false);
+
+            SpawnTeleportPad(root.transform, HetepheresName + "_PadSurface",
+                new Vector3(hw + 2.0f, 0.12f, 0f), pav);
+            SpawnTeleportPad(root.transform, HetepheresName + "_PadBottom",
+                new Vector3(0f, botY + 0.4f, -chamberNS * 0.22f), pav);
+
+            string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Hetepheres I (G 7000X). Queen Hetepheres I (Khufu's mother). Deep rock-cut shaft tomb east of Khufu near SE,\n" +
+                "between Khufu east face and queens G1a (west of East Field mastaba grid).\n" +
+                "Reisner / Lehner schematic: vertical shaft ~" + HetepheresShaftWidthM.ToString("0.0") +
+                " m square, depth ~" + HetepheresShaftDepthM.ToString("0") +
+                " m; bottom chamber with empty alabaster sarcophagus block + niche (attested Reisner excavation).\n" +
+                "Schematic massing - not photogrammetry. Not an invented sealed chamber claim beyond Reisner's G 7000X find.";
+            GizaBuild.HonestyPlate(root.transform, HetepheresName + "_Honesty", honesty, 14f);
+            Transform plate = root.transform.Find(HetepheresName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(hw + 5.5f, 1.45f, hw + 1.5f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+
+            return root;
         }
 
         static GameObject BuildOsirisShaft(GizaComplex.Pose pose)
