@@ -10,6 +10,7 @@ namespace RealityEngine.Visualization
     /// Hemiunu (G 4000) elite mastaba in the West Field (Khufu's vizier; Lehner schematic),
     /// Senedjemib Inti (G 2370) elite mastaba complex in the NW West Field (Lehner schematic),
     /// Ankhhaf (G 7510) elite mastaba in the East Field (Lehner schematic),
+    /// Meresankh III (G 7530-7540) elite double mastaba + rock-cut chapel south of Ankhhaf (Lehner / Reisner),
     /// Debehen rock-cut tomb in the Central Field (Lehner schematic),
     /// Hetepheres I (G 7000X) deep shaft tomb east of Khufu near SE / G1a (Reisner / Lehner schematic),
     /// Menkaure quarry / ramp remnants schematic SW of Menkaure,
@@ -36,6 +37,7 @@ namespace RealityEngine.Visualization
         public const string HemiunuName = "Hemiunu";
         public const string SenedjemibName = "Senedjemib";
         public const string AnkhhafName = "Ankhhaf";
+        public const string MeresankhName = "Meresankh";
         public const string HetepheresName = "Hetepheres";
         public const string DebehenName = "Debehen";
         public const string MenkaureQuarryName = "MenkaureQuarry";
@@ -114,6 +116,22 @@ namespace RealityEngine.Visualization
         public const float AnkhhafChapelEW = 11f;
         public const float AnkhhafChapelNS = 7.5f;
         public const float AnkhhafChapelHM = 4.6f;
+
+        // Meresankh III (G 7530-7540): East Field elite double mastaba + rock-cut chapel south of Ankhhaf (Lehner / Reisner).
+        public const float MeresankhWestInsetFromEastWestEdgeM = 28f;
+        public const float MeresankhNorthFrac = 0.38f;
+        public const float MeresankhBodyEW = 24.0f;
+        public const float MeresankhBodyNS = 36.0f;
+        public const float MeresankhBodyHM = 7.5f;
+        public const float MeresankhUpperEW = 21.0f;
+        public const float MeresankhUpperNS = 33.0f;
+        public const float MeresankhUpperHM = 1.0f;
+        public const float MeresankhChapelEW = 12f;
+        public const float MeresankhChapelNS = 9f;
+        public const float MeresankhChapelHM = 4.8f;
+        public const float MeresankhInnerEW = 8f;
+        public const float MeresankhInnerNS = 6f;
+        public const float MeresankhInnerHM = 3.2f;
 
         // Hetepheres I (G 7000X): SE of Khufu, between east face and queens G1a (Reisner / Lehner).
         // Vertical rock-cut shaft ~2.1-2.5 m square, ~27 m deep; empty alabaster sarcophagus chamber.
@@ -225,6 +243,10 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, aEast, aNorth,
                 AnkhhafBodyEW * 0.5f + AnkhhafChapelEW + 16f, AnkhhafBodyNS * 0.5f + 12f);
 
+            LayoutMeresankh(out float mEast, out float mNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, mEast, mNorth,
+                MeresankhBodyEW * 0.5f + MeresankhChapelEW + 16f, MeresankhBodyNS * 0.5f + 12f);
+
             LayoutHetepheres(out float hetEast, out float hetNorth);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, hetEast, hetNorth,
                 HetepheresShaftWidthM * 0.5f + 12f, HetepheresShaftWidthM * 0.5f + 12f);
@@ -285,6 +307,7 @@ namespace RealityEngine.Visualization
             DestroyNamed(GizaComplex.FindNamed(HemiunuName));
             DestroyNamed(GizaComplex.FindNamed(SenedjemibName));
             DestroyNamed(GizaComplex.FindNamed(AnkhhafName));
+            DestroyNamed(GizaComplex.FindNamed(MeresankhName));
             DestroyNamed(GizaComplex.FindNamed(HetepheresName));
             DestroyNamed(GizaComplex.FindNamed(DebehenName));
             DestroyNamed(GizaComplex.FindNamed(MenkaureQuarryName));
@@ -337,6 +360,14 @@ namespace RealityEngine.Visualization
             if (old != null && old.transform.Find(AnkhhafName + MassingMarker) == null)
                 DestroyNamed(old);
             Ensure(AnkhhafName, pose, BuildAnkhhaf, pose.surfaceY, true);
+        }
+
+        public static void EnsureMeresankh(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(MeresankhName);
+            if (old != null && old.transform.Find(MeresankhName + MassingMarker) == null)
+                DestroyNamed(old);
+            Ensure(MeresankhName, pose, BuildMeresankh, pose.surfaceY, true);
         }
 
         public static void EnsureHetepheres(GizaComplex.Pose pose)
@@ -500,6 +531,14 @@ namespace RealityEngine.Visualization
             // Northern East Field elite mastaba G7510 (Lehner schematic).
             east = east0 + AnkhhafWestInsetFromEastWestEdgeM + AnkhhafBodyEW * 0.5f;
             north = north0 + (north1 - north0) * AnkhhafNorthFrac;
+        }
+
+        static void LayoutMeresankh(out float east, out float north)
+        {
+            LayoutEast(out float east0, out float east1, out float north0, out float north1);
+            // Southern East Field elite double mastaba G7530-7540 south of Ankhhaf (Lehner schematic).
+            east = east0 + MeresankhWestInsetFromEastWestEdgeM + MeresankhBodyEW * 0.5f;
+            north = north0 + (north1 - north0) * MeresankhNorthFrac;
         }
 
         static void LayoutHetepheres(out float east, out float north)
@@ -1440,6 +1479,152 @@ namespace RealityEngine.Visualization
             {
                 plate.localPosition = new Vector3(halfE + chapelEW + 3.5f, 1.6f, chapelNS * 0.5f + 2.5f);
                 plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+            return root;
+        }
+
+        static GameObject BuildMeresankh(GizaComplex.Pose pose)
+        {
+            LayoutMeresankh(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(MeresankhName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material mud = GizaBuild.Mudbrick();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+            Material rock = GizaBuild.Bedrock();
+
+            float bodyEW = MeresankhBodyEW;
+            float bodyNS = MeresankhBodyNS;
+            float bodyH = MeresankhBodyHM;
+            float halfE = bodyEW * 0.5f;
+            float halfN = bodyNS * 0.5f;
+            float chapelEW = MeresankhChapelEW;
+            float chapelNS = MeresankhChapelNS;
+            float chapelH = MeresankhChapelHM;
+            float innerEW = MeresankhInnerEW;
+            float innerNS = MeresankhInnerNS;
+            float innerH = MeresankhInnerHM;
+
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3(chapelEW * 0.35f, 0.06f, 0f),
+                new Vector3(bodyEW + chapelEW + 18f, 0.12f, bodyNS + 16f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MeresankhName + "_Apron",
+                apron.Build(MeresankhName + "_Apron"), sand, true);
+
+            // N-S double mastaba: two limestone lobes + slight mid seam (G 7530 / G 7540 schematic).
+            float lobeNS = bodyNS * 0.48f;
+            float lobeGap = bodyNS * 0.02f;
+            var body = new LabMeshBuilder(24, 36);
+            body.AddBox(new Vector3(0f, bodyH * 0.5f, halfN * 0.5f + lobeGap * 0.25f),
+                new Vector3(bodyEW, bodyH, lobeNS), Color.white);
+            body.AddBox(new Vector3(0f, bodyH * 0.5f, -(halfN * 0.5f + lobeGap * 0.25f)),
+                new Vector3(bodyEW, bodyH, lobeNS), Color.white);
+            body.AddBox(new Vector3(0f, bodyH * 0.42f, 0f),
+                new Vector3(bodyEW * 0.92f, bodyH * 0.55f, bodyNS * 0.08f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MeresankhName + "_Body",
+                body.Build(MeresankhName + "_Body"), lime, true);
+
+            var cornice = new LabMeshBuilder(8, 12);
+            cornice.AddBox(new Vector3(0f, bodyH + MeresankhUpperHM * 0.5f, 0f),
+                new Vector3(MeresankhUpperEW, MeresankhUpperHM, MeresankhUpperNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MeresankhName + "_Cornice",
+                cornice.Build(MeresankhName + "_Cornice"), mud, true);
+
+            float wallT = 0.75f;
+            float doorW = 2.7f;
+            float doorH = 3.0f;
+            float chapelX = halfE + chapelEW * 0.5f + 0.5f;
+            float floorT = 0.28f;
+            float deckY = 0f;
+            var chapelShell = new LabMeshBuilder(64, 96);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + floorT * 0.5f, 0f),
+                new Vector3(chapelEW, floorT, chapelNS), Color.white);
+            float wallY = deckY + chapelH * 0.5f;
+            chapelShell.AddBox(new Vector3(chapelX, wallY, chapelNS * 0.5f - wallT * 0.5f),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, wallY, -(chapelNS * 0.5f - wallT * 0.5f)),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            float wing = (chapelNS - doorW) * 0.5f;
+            float westX = chapelX - chapelEW * 0.5f + wallT * 0.5f;
+            if (wing > 0.35f)
+            {
+                chapelShell.AddBox(new Vector3(westX, wallY, doorW * 0.5f + wing * 0.5f),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+                chapelShell.AddBox(new Vector3(westX, wallY, -(doorW * 0.5f + wing * 0.5f)),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+            }
+            float lintelH = Mathf.Max(0.7f, chapelH - doorH);
+            chapelShell.AddBox(new Vector3(westX, deckY + doorH + lintelH * 0.5f, 0f),
+                new Vector3(wallT * 1.1f, lintelH, doorW + 0.9f), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX + chapelEW * 0.5f - wallT * 0.5f, wallY, 0f),
+                new Vector3(wallT, chapelH, chapelNS), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + chapelH + 0.16f, 0f),
+                new Vector3(chapelEW + 0.3f, 0.32f, chapelNS + 0.3f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MeresankhName + "_Chapel",
+                chapelShell.Build(MeresankhName + "_Chapel"), lime, true);
+
+            // Inner rock-cut room (Bedrock walls — rock-cut character like Debehen).
+            float innerX = chapelX + 0.4f;
+            var innerShell = new LabMeshBuilder(48, 72);
+            float iWall = 0.55f;
+            innerShell.AddBox(new Vector3(innerX, deckY + floorT * 0.5f + 0.05f, 0f),
+                new Vector3(innerEW, floorT, innerNS), Color.white);
+            innerShell.AddBox(new Vector3(innerX, deckY + innerH * 0.5f, innerNS * 0.5f - iWall * 0.5f),
+                new Vector3(innerEW, innerH, iWall), Color.white);
+            innerShell.AddBox(new Vector3(innerX, deckY + innerH * 0.5f, -(innerNS * 0.5f - iWall * 0.5f)),
+                new Vector3(innerEW, innerH, iWall), Color.white);
+            innerShell.AddBox(new Vector3(innerX + innerEW * 0.5f - iWall * 0.5f, deckY + innerH * 0.5f, 0f),
+                new Vector3(iWall, innerH, innerNS), Color.white);
+            innerShell.AddBox(new Vector3(innerX, deckY + innerH + 0.14f, 0f),
+                new Vector3(innerEW + 0.2f, 0.28f, innerNS + 0.2f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MeresankhName + "_InnerRock",
+                innerShell.Build(MeresankhName + "_InnerRock"), rock, true);
+
+            var interior = new LabMeshBuilder(40, 60);
+            interior.AddRoom(new Vector3(chapelX, deckY + floorT + 1.7f, 0f),
+                new Vector3(chapelEW - wallT * 2f - 0.35f, 3.4f, chapelNS - wallT * 2f - 0.5f),
+                Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, MeresankhName + "_ChapelInterior",
+                interior.Build(MeresankhName + "_ChapelInterior"), lime, true);
+
+            var corridor = new LabMeshBuilder(16, 24);
+            float gap = chapelX - chapelEW * 0.5f - halfE;
+            float corrLen = Mathf.Max(1.2f, gap + 0.6f);
+            corridor.AddBox(new Vector3(halfE + corrLen * 0.5f, deckY + 0.1f, 0f),
+                new Vector3(corrLen, 0.2f, doorW + 1.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MeresankhName + "_Corridor",
+                corridor.Build(MeresankhName + "_Corridor"), pav, true);
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, MeresankhName + MassingMarker,
+                mark.Build(MeresankhName + MassingMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Meresankh III (G 7530-7540). Eastern Cemetery elite double mastaba + rock-cut offering chapel south of Ankhhaf.\n" +
+                "Lehner / Reisner schematic massing (~24 x 36 x 7.5 m N-S twin body + cornice, east rock-cut chapel).\n" +
+                "Not photogrammetry. Not full chamber interiors beyond the schematic chapel.";
+            GizaBuild.HonestyPlate(root.transform, MeresankhName + "_Honesty", honesty, 28f);
+            Transform plate = root.transform.Find(MeresankhName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(halfE + chapelEW + 3.5f, 1.6f, chapelNS * 0.5f + 2.5f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+
+            const string chapelText =
+                "Attested offering formula (htp-di-nsw), Latin transliteration only — Dunham & Simpson, The Mastaba of Queen Mersyankh III (Giza Mastabas 1) / Porter-Moss III:\n" +
+                "htp-dj-nsw wsjr ... (queen Mersyankh / Mr.s-anx III)\n" +
+                "Cartouche/name: Mr.s-anx (Meresankh). No invented hieroglyph glyphs (TMP lacks Egyptian font).\n" +
+                "Source: published Giza corpus — not AI-invented text. Abridged attested formula only.";
+            GizaBuild.HonestyPlate(root.transform, MeresankhName + "_ChapelText", chapelText, 22f);
+            Transform textPlate = root.transform.Find(MeresankhName + "_ChapelText");
+            if (textPlate != null)
+            {
+                textPlate.localPosition = new Vector3(chapelX, 1.45f, -(chapelNS * 0.5f + 2.2f));
+                textPlate.localRotation = Quaternion.Euler(0f, 0f, 0f);
             }
             return root;
         }
