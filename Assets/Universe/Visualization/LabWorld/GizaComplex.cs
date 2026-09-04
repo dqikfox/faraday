@@ -322,7 +322,7 @@ namespace RealityEngine.Visualization
         public static Material Bedrock()
         {
             EnsureFreshStoneMats();
-            // Plateau top: limestone courses, not Oasis sand.
+            // Terrace / cut-bedrock massings (plateau top uses Oasis sand via DesertSand).
             return CachedLit(ref _rock, "RELab_GizaBedrock", new Color(0.54f, 0.49f, 0.42f, 1f), 0.02f, 0.11f,
                 LabWorldMeshes.MakeCliffTexture(), Vector2.one,
                 LabWorldMeshes.MakeCliffNormal(), 1.35f);
@@ -677,7 +677,7 @@ namespace RealityEngine.Visualization
                 else if (l.Contains("cliff") || mn.Contains("HillRock") || mn.Contains("Cliff"))
                     mr.sharedMaterial = cliff;
                 else if (l == "gizaplateau" || l.Contains("gizaplateautop"))
-                    mr.sharedMaterial = rock;
+                    mr.sharedMaterial = sand;
                 else if (l.Contains("casinggranite") || l.Contains("aswan") || mn.Contains("Aswan"))
                     mr.sharedMaterial = aswan;
                 else if (l.Contains("casing") || mn.Contains("TuraCasing"))
