@@ -191,6 +191,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("senedjemib") || lower.Contains("g2370")
                 || lower.Contains("ankhhaf") || lower.Contains("g7510")
                 || lower.Contains("meresankh") || lower.Contains("g7530") || lower.Contains("g7540")
+                || lower.Contains("kawab") || lower.Contains("kawáb") || lower.Contains("g7110") || lower.Contains("g7120")
                 || lower.Contains("hetepheres") || lower.Contains("g7000x")
                 || lower.Contains("debehen") || lower.Contains("menkaurequarry")
                 || lower.Contains("gizasurveyanomalies") || lower.Contains("surveyanomal")
@@ -747,6 +748,7 @@ namespace RealityEngine.Visualization
             SitFound("Senedjemib", top);
             SitFound("Ankhhaf", top);
             SitFound("Meresankh", top);
+            SitFound("Kawab", top);
             SitFound("Hetepheres", top);
             SitFound("Debehen", terrace);
             SitFound("MenkaureQuarry", top);
