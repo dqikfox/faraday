@@ -193,6 +193,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("meresankh") || lower.Contains("g7530") || lower.Contains("g7540")
                 || lower.Contains("kawab") || lower.Contains("kawáb") || lower.Contains("g7110") || lower.Contains("g7120")
                 || lower.Contains("idu") || lower.Contains("g7102")
+                || lower.Contains("khufukhaf") || lower.Contains("g7130") || lower.Contains("g7140")
                 || lower.Contains("hetepheres") || lower.Contains("g7000x")
                 || lower.Contains("debehen") || lower.Contains("menkaurequarry")
                 || lower.Contains("gizasurveyanomalies") || lower.Contains("surveyanomal")
@@ -751,6 +752,7 @@ namespace RealityEngine.Visualization
             SitFound("Meresankh", top);
             SitFound("Kawab", top);
             SitFound("Idu", top);
+            SitFound("Khufukhaf", top);
             SitFound("Hetepheres", top);
             SitFound("Debehen", terrace);
             SitFound("MenkaureQuarry", top);
