@@ -189,6 +189,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("trialpassages") || lower.Contains("khufutrial")
                 || lower.Contains("hemiunu") || lower.Contains("g4000")
                 || lower.Contains("senedjemib") || lower.Contains("g2370")
+                || lower.Contains("babaef") || lower.Contains("khnumbaf") || lower.Contains("g5230")
                 || lower.Contains("ankhhaf") || lower.Contains("g7510")
                 || lower.Contains("meresankh") || lower.Contains("g7530") || lower.Contains("g7540")
                 || lower.Contains("kawab") || lower.Contains("kawáb") || lower.Contains("g7110") || lower.Contains("g7120")
@@ -751,6 +752,7 @@ namespace RealityEngine.Visualization
             SitFound("GisrElMudir", top);
             SitFound("Hemiunu", top);
             SitFound("Senedjemib", top);
+        SitFound("Babaef", top);
             SitFound("Ankhhaf", top);
             SitFound("Meresankh", top);
             SitFound("Kawab", top);
