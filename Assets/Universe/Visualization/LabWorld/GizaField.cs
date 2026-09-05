@@ -13,6 +13,7 @@ namespace RealityEngine.Visualization
     /// Meresankh III (G 7530-7540) elite double mastaba + rock-cut chapel south of Ankhhaf (Lehner / Reisner),
     /// Kawab (G 7110-7120) elite double mastaba between Meresankh and Ankhhaf in the East Field (Lehner / Reisner),
     /// Idu (G 7102) East Field rock-cut offering chapel near Cemetery G 7000 (Simpson / Lehner),
+    /// Khufukhaf I (G 7130-7140) East Field elite double mastaba east of Kawab (Lehner / Reisner),
     /// Debehen rock-cut tomb in the Central Field (Lehner schematic),
     /// Hetepheres I (G 7000X) deep shaft tomb east of Khufu near SE / G1a (Reisner / Lehner schematic),
     /// Menkaure quarry / ramp remnants schematic SW of Menkaure,
@@ -42,6 +43,7 @@ namespace RealityEngine.Visualization
         public const string MeresankhName = "Meresankh";
         public const string KawabName = "Kawab";
         public const string IduName = "Idu";
+        public const string KhufukhafName = "Khufukhaf";
         public const string HetepheresName = "Hetepheres";
         public const string DebehenName = "Debehen";
         public const string MenkaureQuarryName = "MenkaureQuarry";
@@ -163,6 +165,20 @@ namespace RealityEngine.Visualization
         public const float IduSuperEW = 12.0f;
         public const float IduSuperNS = 10.0f;
         public const float IduSuperHM = 3.2f;
+
+        // Khufukhaf I (G 7130-7140): East Field elite double mastaba east of Kawab (Lehner / Reisner).
+        // Son of Khufu; N-S twin body G7130/G7140; east offering chapel schematic.
+        public const float KhufukhafWestInsetFromEastWestEdgeM = 34f;
+        public const float KhufukhafNorthFrac = 0.62f;
+        public const float KhufukhafBodyEW = 20.0f;
+        public const float KhufukhafBodyNS = 40.0f;
+        public const float KhufukhafBodyHM = 7.8f;
+        public const float KhufukhafUpperEW = 17.5f;
+        public const float KhufukhafUpperNS = 37.0f;
+        public const float KhufukhafUpperHM = 1.0f;
+        public const float KhufukhafChapelEW = 9.5f;
+        public const float KhufukhafChapelNS = 6.8f;
+        public const float KhufukhafChapelHM = 4.4f;
 
         // Hetepheres I (G 7000X): SE of Khufu, between east face and queens G1a (Reisner / Lehner).
         // Vertical rock-cut shaft ~2.1-2.5 m square, ~27 m deep; empty alabaster sarcophagus chamber.
@@ -286,6 +302,10 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, iduEast, iduNorth,
                 IduSuperEW * 0.5f + IduCourtEW + IduChapelEW + 14f, IduCourtNS * 0.5f + 12f);
 
+            LayoutKhufukhaf(out float khfEast, out float khfNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, khfEast, khfNorth,
+                KhufukhafBodyEW * 0.5f + KhufukhafChapelEW + 16f, KhufukhafBodyNS * 0.5f + 12f);
+
             LayoutHetepheres(out float hetEast, out float hetNorth);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, hetEast, hetNorth,
                 HetepheresShaftWidthM * 0.5f + 12f, HetepheresShaftWidthM * 0.5f + 12f);
@@ -349,6 +369,7 @@ namespace RealityEngine.Visualization
             DestroyNamed(GizaComplex.FindNamed(MeresankhName));
             DestroyNamed(GizaComplex.FindNamed(KawabName));
             DestroyNamed(GizaComplex.FindNamed(IduName));
+            DestroyNamed(GizaComplex.FindNamed(KhufukhafName));
             DestroyNamed(GizaComplex.FindNamed(HetepheresName));
             DestroyNamed(GizaComplex.FindNamed(DebehenName));
             DestroyNamed(GizaComplex.FindNamed(MenkaureQuarryName));
@@ -425,6 +446,14 @@ namespace RealityEngine.Visualization
             if (old != null && old.transform.Find(IduName + MassingMarker) == null)
                 DestroyNamed(old);
             Ensure(IduName, pose, BuildIdu, pose.surfaceY, true);
+        }
+
+        public static void EnsureKhufukhaf(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(KhufukhafName);
+            if (old != null && old.transform.Find(KhufukhafName + MassingMarker) == null)
+                DestroyNamed(old);
+            Ensure(KhufukhafName, pose, BuildKhufukhaf, pose.surfaceY, true);
         }
 
         public static void EnsureHetepheres(GizaComplex.Pose pose)
@@ -612,6 +641,14 @@ namespace RealityEngine.Visualization
             // G 7102 near Cemetery G 7000 / queens strip: west of deep Ankhhaf, between Kawab (~0.58) and Meresankh (~0.38).
             east = east0 + IduWestInsetFromEastWestEdgeM + IduSuperEW * 0.5f;
             north = north0 + (north1 - north0) * IduNorthFrac;
+        }
+
+        static void LayoutKhufukhaf(out float east, out float north)
+        {
+            LayoutEast(out float east0, out float east1, out float north0, out float north1);
+            // G 7130-7140 east of Kawab strip (Lehner / Reisner Eastern Cemetery).
+            east = east0 + KhufukhafWestInsetFromEastWestEdgeM + KhufukhafBodyEW * 0.5f;
+            north = north0 + (north1 - north0) * KhufukhafNorthFrac;
         }
 
         static void LayoutHetepheres(out float east, out float north)
@@ -1958,6 +1995,129 @@ namespace RealityEngine.Visualization
             if (textPlate != null)
             {
                 textPlate.localPosition = new Vector3(chapelX, 1.4f, -(chapelNS * 0.5f + 2.0f));
+                textPlate.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            }
+            return root;
+        }
+
+        static GameObject BuildKhufukhaf(GizaComplex.Pose pose)
+        {
+            LayoutKhufukhaf(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(KhufukhafName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material mud = GizaBuild.Mudbrick();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+
+            float bodyEW = KhufukhafBodyEW;
+            float bodyNS = KhufukhafBodyNS;
+            float bodyH = KhufukhafBodyHM;
+            float halfE = bodyEW * 0.5f;
+            float halfN = bodyNS * 0.5f;
+            float chapelEW = KhufukhafChapelEW;
+            float chapelNS = KhufukhafChapelNS;
+            float chapelH = KhufukhafChapelHM;
+
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3(chapelEW * 0.35f, 0.06f, 0f),
+                new Vector3(bodyEW + chapelEW + 18f, 0.12f, bodyNS + 16f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhufukhafName + "_Apron",
+                apron.Build(KhufukhafName + "_Apron"), sand, true);
+
+            // N-S double mastaba: two limestone lobes + mid seam (G 7130 / G 7140 schematic).
+            float lobeNS = bodyNS * 0.48f;
+            float lobeGap = bodyNS * 0.02f;
+            var body = new LabMeshBuilder(24, 36);
+            body.AddBox(new Vector3(0f, bodyH * 0.5f, halfN * 0.5f + lobeGap * 0.25f),
+                new Vector3(bodyEW, bodyH, lobeNS), Color.white);
+            body.AddBox(new Vector3(0f, bodyH * 0.5f, -(halfN * 0.5f + lobeGap * 0.25f)),
+                new Vector3(bodyEW, bodyH, lobeNS), Color.white);
+            body.AddBox(new Vector3(0f, bodyH * 0.42f, 0f),
+                new Vector3(bodyEW * 0.92f, bodyH * 0.55f, bodyNS * 0.08f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhufukhafName + "_Body",
+                body.Build(KhufukhafName + "_Body"), lime, true);
+
+            var cornice = new LabMeshBuilder(8, 12);
+            cornice.AddBox(new Vector3(0f, bodyH + KhufukhafUpperHM * 0.5f, 0f),
+                new Vector3(KhufukhafUpperEW, KhufukhafUpperHM, KhufukhafUpperNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhufukhafName + "_Cornice",
+                cornice.Build(KhufukhafName + "_Cornice"), mud, true);
+
+            float wallT = 0.75f;
+            float doorW = 2.6f;
+            float doorH = 2.9f;
+            float chapelX = halfE + chapelEW * 0.5f + 0.5f;
+            float floorT = 0.28f;
+            float deckY = 0f;
+            var chapelShell = new LabMeshBuilder(64, 96);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + floorT * 0.5f, 0f),
+                new Vector3(chapelEW, floorT, chapelNS), Color.white);
+            float wallY = deckY + chapelH * 0.5f;
+            chapelShell.AddBox(new Vector3(chapelX, wallY, chapelNS * 0.5f - wallT * 0.5f),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, wallY, -(chapelNS * 0.5f - wallT * 0.5f)),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            float wing = (chapelNS - doorW) * 0.5f;
+            float westX = chapelX - chapelEW * 0.5f + wallT * 0.5f;
+            if (wing > 0.35f)
+            {
+                chapelShell.AddBox(new Vector3(westX, wallY, doorW * 0.5f + wing * 0.5f),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+                chapelShell.AddBox(new Vector3(westX, wallY, -(doorW * 0.5f + wing * 0.5f)),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+            }
+            float lintelH = Mathf.Max(0.7f, chapelH - doorH);
+            chapelShell.AddBox(new Vector3(westX, deckY + doorH + lintelH * 0.5f, 0f),
+                new Vector3(wallT * 1.1f, lintelH, doorW + 0.9f), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + chapelH + 0.16f, 0f),
+                new Vector3(chapelEW + 0.3f, 0.32f, chapelNS + 0.3f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhufukhafName + "_Chapel",
+                chapelShell.Build(KhufukhafName + "_Chapel"), lime, true);
+
+            var interior = new LabMeshBuilder(40, 60);
+            interior.AddRoom(new Vector3(chapelX, deckY + floorT + 1.65f, 0f),
+                new Vector3(chapelEW - wallT * 2f - 0.35f, 3.3f, chapelNS - wallT * 2f - 0.5f),
+                Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, KhufukhafName + "_ChapelInterior",
+                interior.Build(KhufukhafName + "_ChapelInterior"), lime, true);
+
+            var corridor = new LabMeshBuilder(16, 24);
+            float gap = chapelX - chapelEW * 0.5f - halfE;
+            float corrLen = Mathf.Max(1.2f, gap + 0.6f);
+            corridor.AddBox(new Vector3(halfE + corrLen * 0.5f, deckY + 0.1f, 0f),
+                new Vector3(corrLen, 0.2f, doorW + 1.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhufukhafName + "_Corridor",
+                corridor.Build(KhufukhafName + "_Corridor"), pav, true);
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, KhufukhafName + MassingMarker,
+                mark.Build(KhufukhafName + MassingMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Khufukhaf I (G 7130-7140). Son of Khufu — Eastern Cemetery elite double mastaba.\n" +
+                "Lehner / Reisner schematic massing (~20 x 40 x 7.8 m N-S twin body + cornice, east offering chapel).\n" +
+                "Not photogrammetry. Not proven chambers beyond the schematic chapel.";
+            GizaBuild.HonestyPlate(root.transform, KhufukhafName + "_Honesty", honesty, 28f);
+            Transform plate = root.transform.Find(KhufukhafName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(halfE + chapelEW + 3.5f, 1.6f, chapelNS * 0.5f + 2.5f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+
+            const string chapelText =
+                "Name plate, Latin transliteration only — Reisner / Lehner Giza corpus:\n" +
+                "xwfw-xa.f (Khufukhaf I). Son of Khufu; G 7130-7140 Eastern Cemetery.\n" +
+                "No invented hieroglyph glyphs (TMP lacks Egyptian font).\n" +
+                "Source: published Giza mastaba corpus — not AI-invented text.";
+            GizaBuild.HonestyPlate(root.transform, KhufukhafName + "_ChapelText", chapelText, 22f);
+            Transform textPlate = root.transform.Find(KhufukhafName + "_ChapelText");
+            if (textPlate != null)
+            {
+                textPlate.localPosition = new Vector3(chapelX, 1.45f, -(chapelNS * 0.5f + 2.2f));
                 textPlate.localRotation = Quaternion.Euler(0f, 0f, 0f);
             }
             return root;
