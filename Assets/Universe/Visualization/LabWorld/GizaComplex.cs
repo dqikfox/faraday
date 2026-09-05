@@ -193,6 +193,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("meresankh") || lower.Contains("g7530") || lower.Contains("g7540")
                 || lower.Contains("kawab") || lower.Contains("kawáb") || lower.Contains("g7110") || lower.Contains("g7120")
                 || lower.Contains("idu") || lower.Contains("g7102")
+                || lower.Contains("qar") || lower.Contains("g7101")
                 || lower.Contains("khufukhaf") || lower.Contains("g7130") || lower.Contains("g7140")
                 || lower.Contains("hordjedef") || lower.Contains("djedefhor") || lower.Contains("g7210") || lower.Contains("g7220")
                 || lower.Contains("hetepheres") || lower.Contains("g7000x")
@@ -753,6 +754,7 @@ namespace RealityEngine.Visualization
             SitFound("Meresankh", top);
             SitFound("Kawab", top);
             SitFound("Idu", top);
+            SitFound("Qar", top);
             SitFound("Khufukhaf", top);
             SitFound("Hordjedef", top);
             SitFound("Hetepheres", top);
