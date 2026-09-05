@@ -11,6 +11,7 @@ namespace RealityEngine.Visualization
     /// Senedjemib Inti (G 2370) elite mastaba complex in the NW West Field (Lehner schematic),
     /// Babaef / Khnumbaf (G 5230) elite mastaba in the central West Field (Lehner / Reisner schematic),
     /// Duaenre (G 5110) elite mastaba in the southern West Field (son of Khafre; Lehner / Reisner schematic),
+    /// Seshemnefer IV (G 5170) elite mastaba in the southern West Field (Lehner / Reisner schematic),
     /// Ankhhaf (G 7510) elite mastaba in the East Field (Lehner schematic),
     /// Meresankh III (G 7530-7540) elite double mastaba + rock-cut chapel south of Ankhhaf (Lehner / Reisner),
     /// Kawab (G 7110-7120) elite double mastaba between Meresankh and Ankhhaf in the East Field (Lehner / Reisner),
@@ -45,6 +46,7 @@ namespace RealityEngine.Visualization
         public const string SenedjemibName = "Senedjemib";
         public const string BabaefName = "Babaef";
         public const string DuaenreName = "Duaenre";
+        public const string SeshemneferName = "Seshemnefer";
         public const string AnkhhafName = "Ankhhaf";
         public const string MeresankhName = "Meresankh";
         public const string KawabName = "Kawab";
@@ -145,6 +147,20 @@ namespace RealityEngine.Visualization
         public const float DuaenreChapelEW = 10.0f;
         public const float DuaenreChapelNS = 7.0f;
         public const float DuaenreChapelHM = 4.4f;
+
+        // Seshemnefer IV (G 5170): southern West Field elite mastaba (Lehner / Reisner).
+        // Between Babaef (north) and Duaenre (south), slightly deeper west into Cemetery G 5000.
+        public const float SeshemneferEastInsetFromWestEastEdgeM = 68f;
+        public const float SeshemneferNorthFrac = 0.36f;
+        public const float SeshemneferBodyEW = 36.0f;
+        public const float SeshemneferBodyNS = 20.5f;
+        public const float SeshemneferBodyHM = 9.0f;
+        public const float SeshemneferUpperEW = 33.0f;
+        public const float SeshemneferUpperNS = 18.5f;
+        public const float SeshemneferUpperHM = 1.05f;
+        public const float SeshemneferChapelEW = 10.5f;
+        public const float SeshemneferChapelNS = 7.2f;
+        public const float SeshemneferChapelHM = 4.5f;
 
         // Ankhhaf (G 7510): oversized East Field elite mastaba (Khafre's vizier; Lehner schematic).
         // Northern East Field, closer to Khufu east apron than the dense street grid.
@@ -372,6 +388,10 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, duaEast, duaNorth,
                 DuaenreBodyEW * 0.5f + DuaenreChapelEW + 14f, DuaenreBodyNS * 0.5f + 12f);
 
+            LayoutSeshemnefer(out float seshEast, out float seshNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, seshEast, seshNorth,
+                SeshemneferBodyEW * 0.5f + SeshemneferChapelEW + 14f, SeshemneferBodyNS * 0.5f + 12f);
+
             LayoutAnkhhaf(out float aEast, out float aNorth);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, aEast, aNorth,
                 AnkhhafBodyEW * 0.5f + AnkhhafChapelEW + 16f, AnkhhafBodyNS * 0.5f + 12f);
@@ -465,6 +485,7 @@ namespace RealityEngine.Visualization
             DestroyNamed(GizaComplex.FindNamed(SenedjemibName));
             DestroyNamed(GizaComplex.FindNamed(BabaefName));
             DestroyNamed(GizaComplex.FindNamed(DuaenreName));
+            DestroyNamed(GizaComplex.FindNamed(SeshemneferName));
             DestroyNamed(GizaComplex.FindNamed(AnkhhafName));
             DestroyNamed(GizaComplex.FindNamed(MeresankhName));
             DestroyNamed(GizaComplex.FindNamed(KawabName));
@@ -533,6 +554,14 @@ namespace RealityEngine.Visualization
             if (old != null && old.transform.Find(DuaenreName + MassingMarker) == null)
                 DestroyNamed(old);
             Ensure(DuaenreName, pose, BuildDuaenre, pose.surfaceY, true);
+        }
+
+        public static void EnsureSeshemnefer(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(SeshemneferName);
+            if (old != null && old.transform.Find(SeshemneferName + MassingMarker) == null)
+                DestroyNamed(old);
+            Ensure(SeshemneferName, pose, BuildSeshemnefer, pose.surfaceY, true);
         }
 
         public static void EnsureAnkhhaf(GizaComplex.Pose pose)
@@ -769,6 +798,15 @@ namespace RealityEngine.Visualization
             east = east1 - DuaenreEastInsetFromWestEastEdgeM;
             north = north0 + (north1 - north0) * DuaenreNorthFrac;
         }
+
+        static void LayoutSeshemnefer(out float east, out float north)
+        {
+            LayoutWest(out float east0, out float east1, out float north0, out float north1);
+            // G 5170 Cemetery G 5000: between Babaef and Duaenre, deeper west (Lehner / Reisner).
+            east = east1 - SeshemneferEastInsetFromWestEastEdgeM;
+            north = north0 + (north1 - north0) * SeshemneferNorthFrac;
+        }
+
 
         static void LayoutAnkhhaf(out float east, out float north)
         {
@@ -1756,6 +1794,122 @@ namespace RealityEngine.Visualization
                 "Source: published Giza mastaba corpus - not AI-invented text.";
             GizaBuild.HonestyPlate(root.transform, DuaenreName + "_ChapelText", chapelText, 22f);
             Transform textPlate = root.transform.Find(DuaenreName + "_ChapelText");
+            if (textPlate != null)
+            {
+                textPlate.localPosition = new Vector3(chapelX, 1.45f, -(chapelNS * 0.5f + 2.2f));
+                textPlate.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            }
+            return root;
+        }
+
+
+        static GameObject BuildSeshemnefer(GizaComplex.Pose pose)
+        {
+            LayoutSeshemnefer(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(SeshemneferName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material mud = GizaBuild.Mudbrick();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+
+            float bodyEW = SeshemneferBodyEW;
+            float bodyNS = SeshemneferBodyNS;
+            float bodyH = SeshemneferBodyHM;
+            float halfE = bodyEW * 0.5f;
+            float chapelEW = SeshemneferChapelEW;
+            float chapelNS = SeshemneferChapelNS;
+            float chapelH = SeshemneferChapelHM;
+
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3(chapelEW * 0.35f, 0.06f, 0f),
+                new Vector3(bodyEW + chapelEW + 16f, 0.12f, bodyNS + 14f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SeshemneferName + "_Apron",
+                apron.Build(SeshemneferName + "_Apron"), sand, true);
+
+            var body = new LabMeshBuilder(8, 12);
+            body.AddBox(new Vector3(0f, bodyH * 0.5f, 0f), new Vector3(bodyEW, bodyH, bodyNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SeshemneferName + "_Body",
+                body.Build(SeshemneferName + "_Body"), lime, true);
+
+            var cornice = new LabMeshBuilder(8, 12);
+            cornice.AddBox(new Vector3(0f, bodyH + SeshemneferUpperHM * 0.5f, 0f),
+                new Vector3(SeshemneferUpperEW, SeshemneferUpperHM, SeshemneferUpperNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SeshemneferName + "_Cornice",
+                cornice.Build(SeshemneferName + "_Cornice"), mud, true);
+
+            float wallT = 0.75f;
+            float doorW = 2.6f;
+            float doorH = 3.0f;
+            float chapelX = halfE + chapelEW * 0.5f + 0.4f;
+            float floorT = 0.28f;
+            float deckY = 0f;
+
+            var chapelShell = new LabMeshBuilder(64, 96);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + floorT * 0.5f, 0f),
+                new Vector3(chapelEW, floorT, chapelNS), Color.white);
+            float wallY = deckY + chapelH * 0.5f;
+            chapelShell.AddBox(new Vector3(chapelX, wallY, chapelNS * 0.5f - wallT * 0.5f),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, wallY, -(chapelNS * 0.5f - wallT * 0.5f)),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            float wing = (chapelNS - doorW) * 0.5f;
+            float westX = chapelX - chapelEW * 0.5f + wallT * 0.5f;
+            if (wing > 0.35f)
+            {
+                chapelShell.AddBox(new Vector3(westX, wallY, doorW * 0.5f + wing * 0.5f),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+                chapelShell.AddBox(new Vector3(westX, wallY, -(doorW * 0.5f + wing * 0.5f)),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+            }
+            float lintelH = Mathf.Max(0.7f, chapelH - doorH);
+            chapelShell.AddBox(new Vector3(westX, deckY + doorH + lintelH * 0.5f, 0f),
+                new Vector3(wallT * 1.1f, lintelH, doorW + 0.9f), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + chapelH + 0.16f, 0f),
+                new Vector3(chapelEW + 0.3f, 0.32f, chapelNS + 0.3f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SeshemneferName + "_Chapel",
+                chapelShell.Build(SeshemneferName + "_Chapel"), lime, true);
+
+            var interior = new LabMeshBuilder(40, 60);
+            interior.AddRoom(new Vector3(chapelX, deckY + floorT + 1.7f, 0f),
+                new Vector3(chapelEW - wallT * 2f - 0.35f, 3.4f, chapelNS - wallT * 2f - 0.5f),
+                Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, SeshemneferName + "_ChapelInterior",
+                interior.Build(SeshemneferName + "_ChapelInterior"), lime, true);
+
+            var corridor = new LabMeshBuilder(16, 24);
+            float gap = chapelX - chapelEW * 0.5f - halfE;
+            float corrLen = Mathf.Max(1.2f, gap + 0.6f);
+            corridor.AddBox(new Vector3(halfE + corrLen * 0.5f, deckY + 0.1f, 0f),
+                new Vector3(corrLen, 0.2f, doorW + 1.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SeshemneferName + "_Corridor",
+                corridor.Build(SeshemneferName + "_Corridor"), pav, true);
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, SeshemneferName + MassingMarker,
+                mark.Build(SeshemneferName + MassingMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Seshemnefer IV (G 5170). Western Cemetery elite mastaba (5th Dynasty court official lineage).\n" +
+                "Lehner / Reisner schematic massing (~36 x 20.5 x 9.0 m limestone body + cornice, east offering chapel).\n" +
+                "Not photogrammetry. Not proven interior chambers beyond the schematic chapel.";
+            GizaBuild.HonestyPlate(root.transform, SeshemneferName + "_Honesty", honesty, 26f);
+            Transform plate = root.transform.Find(SeshemneferName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(halfE + chapelEW + 3.5f, 1.6f, chapelNS * 0.5f + 2.5f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+
+            const string chapelText =
+                "Name plate, Latin transliteration only - Reisner / Lehner / Porter-Moss:\n" +
+                "sSm-nfr (Seshemnefer IV). G 5170 Western Cemetery.\n" +
+                "No invented hieroglyph glyphs (TMP lacks Egyptian font).\n" +
+                "Source: published Giza mastaba corpus - not AI-invented text.";
+            GizaBuild.HonestyPlate(root.transform, SeshemneferName + "_ChapelText", chapelText, 22f);
+            Transform textPlate = root.transform.Find(SeshemneferName + "_ChapelText");
             if (textPlate != null)
             {
                 textPlate.localPosition = new Vector3(chapelX, 1.45f, -(chapelNS * 0.5f + 2.2f));

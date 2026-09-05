@@ -191,6 +191,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("senedjemib") || lower.Contains("g2370")
                 || lower.Contains("babaef") || lower.Contains("khnumbaf") || lower.Contains("g5230")
                 || lower.Contains("duaenre") || lower.Contains("g5110")
+                || lower.Contains("seshemnefer") || lower.Contains("g5170")
                 || lower.Contains("ankhhaf") || lower.Contains("g7510")
                 || lower.Contains("meresankh") || lower.Contains("g7530") || lower.Contains("g7540")
                 || lower.Contains("kawab") || lower.Contains("kawÃ¡b") || lower.Contains("g7110") || lower.Contains("g7120")
@@ -805,6 +806,7 @@ namespace RealityEngine.Visualization
             SitFound("Senedjemib", top);
         SitFound("Babaef", top);
             SitFound("Duaenre", top);
+            SitFound("Seshemnefer", top);
             SitFound("Ankhhaf", top);
             SitFound("Meresankh", top);
             SitFound("Kawab", top);
