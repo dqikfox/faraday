@@ -1,19 +1,19 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 namespace RealityEngine.Visualization
 {
     /// <summary>
-    /// Giza necropolis at 1:1. Offsets from Khufu centre are approx. WGS84 at lat 30Ã‚Â°.
+    /// Giza necropolis at 1:1. Offsets from Khufu centre are approx. WGS84 at lat 30Ãƒâ€šÃ‚Â°.
     /// Architectural local space: origin at Khufu base centre, +Y up, +Z north, +X east.
     /// </summary>
     public static class GizaComplex
     {
         public const float Cubit = 0.5236f;
-        public const float MarginM = 80f;
+        public const float MarginM = 140f;
         public const float CliffHeightM = 32f;
         public const float SphinxCourtDropM = 12f;
-        public const float DesertSizeM = 2600f;
+        public const float DesertSizeM = 4200f;
         public const float KhafreWestM = 323f;
         public const float KhafreSouthM = 342f;
         public const float KhafreBedrockM = 10f;
@@ -192,7 +192,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("babaef") || lower.Contains("khnumbaf") || lower.Contains("g5230")
                 || lower.Contains("ankhhaf") || lower.Contains("g7510")
                 || lower.Contains("meresankh") || lower.Contains("g7530") || lower.Contains("g7540")
-                || lower.Contains("kawab") || lower.Contains("kawáb") || lower.Contains("g7110") || lower.Contains("g7120")
+                || lower.Contains("kawab") || lower.Contains("kawÃ¡b") || lower.Contains("g7110") || lower.Contains("g7120")
                 || lower.Contains("idu") || lower.Contains("g7102")
                 || lower.Contains("qar") || lower.Contains("g7101")
                 || lower.Contains("khufukhaf") || lower.Contains("g7130") || lower.Contains("g7140")
@@ -207,7 +207,7 @@ namespace RealityEngine.Visualization
 
     /// <summary>
     /// Shared undamaged true-pyramid casing, pyramidion, pavement, honesty plate.
-    /// 4-face shells only Ã¢â‚¬â€ no filled core (walkable interiors do not clip solid rock).
+    /// 4-face shells only ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no filled core (walkable interiors do not clip solid rock).
     /// </summary>
     public static class GizaBuild
     {
@@ -352,45 +352,95 @@ namespace RealityEngine.Visualization
             return mat;
         }
 
+        /// <summary>
+        /// Warm desert sand for GizaPlateau / GizaDesert / dune skirts.
+        /// Rejects OasisTerrain Shader Graph (renders black void on non-terrain meshes in Scene View).
+        /// Prefers Resources RELab_OasisSand as URP Lit, else Oasis gravel Lit, else procedural URP Lit.
+        /// </summary>
         public static Material DesertSand()
         {
             if (_sand != null)
                 return _sand;
 
             Material oasis = LoadOasisAsset(OasisSandResource, OasisSandPath);
-            if (oasis != null && !LabWorldMeshes.MaterialLooksPink(oasis))
+            if (OasisSandUsable(oasis))
             {
                 _sand = new Material(oasis)
                 {
                     name = "RELab_OasisSand",
                     hideFlags = HideFlags.DontSave
                 };
-                if (_sand.HasProperty("_Glitter_On"))
-                    _sand.SetFloat("_Glitter_On", 1f);
-                if (_sand.HasProperty("_Glitter_Strength"))
-                    _sand.SetFloat("_Glitter_Strength", 0.22f);
-                if (_sand.HasProperty("_Glitter_Strength_in_Shadow"))
-                    _sand.SetFloat("_Glitter_Strength_in_Shadow", 0.35f);
+                WarmOasisSand(_sand);
                 return _sand;
             }
 
             Material gravel = LoadOasisAsset(OasisGravelResource, OasisGravelPath);
-            if (gravel != null && !LabWorldMeshes.MaterialLooksPink(gravel))
+            if (OasisSandUsable(gravel))
             {
                 _sand = new Material(gravel)
                 {
                     name = "RELab_OasisSand",
                     hideFlags = HideFlags.DontSave
                 };
+                WarmOasisSand(_sand);
                 Texture2D albedo = null;
                 if (_sand.HasProperty("_BaseMap"))
                     albedo = _sand.GetTexture("_BaseMap") as Texture2D;
-                LabWorldMeshes.ApplyAlbedo(_sand, albedo, new Vector2(0.12f, 0.12f));
+                LabWorldMeshes.ApplyAlbedo(_sand, albedo, new Vector2(0.08f, 0.08f));
                 return _sand;
             }
 
-            return CachedLit(ref _sand, "RELab_GizaSand", new Color(0.78f, 0.66f, 0.44f, 1f), 0.02f, 0.10f,
-                LabWorldMeshes.MakeDesertSandTexture(), Vector2.one);
+            return CachedLit(ref _sand, "RELab_GizaSand", new Color(0.86f, 0.74f, 0.52f, 1f), 0.02f, 0.12f,
+                LabWorldMeshes.MakeDesertSandTexture(), new Vector2(0.08f, 0.08f));
+        }
+
+        static bool OasisSandUsable(Material mat)
+        {
+            if (mat == null || LabWorldMeshes.MaterialLooksPink(mat) || mat.shader == null)
+                return false;
+            string sn = mat.shader.name ?? "";
+            // OasisTerrain Shader Graph + black Layer2 dark = solid black void under monuments.
+            if (sn.IndexOf("OasisTerrain", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                return false;
+            if (sn.IndexOf("Shader Graphs", System.StringComparison.OrdinalIgnoreCase) >= 0
+                && sn.IndexOf("/Lit", System.StringComparison.OrdinalIgnoreCase) < 0
+                && sn.IndexOf(" Lit", System.StringComparison.OrdinalIgnoreCase) < 0)
+                return false;
+            if (mat.HasProperty("_BaseColor"))
+            {
+                Color c = mat.GetColor("_BaseColor");
+                if (c.r + c.g + c.b < 0.08f)
+                    return false;
+            }
+            return true;
+        }
+
+        static void WarmOasisSand(Material mat)
+        {
+            if (mat == null)
+                return;
+            var warm = new Color(0.86f, 0.74f, 0.52f, 1f);
+            if (mat.HasProperty("_BaseColor"))
+                mat.SetColor("_BaseColor", warm);
+            if (mat.HasProperty("_Color"))
+                mat.SetColor("_Color", warm);
+            mat.color = warm;
+            if (mat.HasProperty("_Smoothness"))
+                mat.SetFloat("_Smoothness", 0.12f);
+            if (mat.HasProperty("_Metallic"))
+                mat.SetFloat("_Metallic", 0.02f);
+            if (mat.HasProperty("_BaseMap"))
+            {
+                Vector2 scale = mat.GetTextureScale("_BaseMap");
+                if (scale.x >= 0.5f)
+                    mat.SetTextureScale("_BaseMap", new Vector2(0.08f, 0.08f));
+            }
+            if (mat.HasProperty("_MainTex"))
+            {
+                Vector2 scale = mat.GetTextureScale("_MainTex");
+                if (scale.x >= 0.5f)
+                    mat.SetTextureScale("_MainTex", new Vector2(0.08f, 0.08f));
+            }
         }
 
         public static Material NileSilt()
