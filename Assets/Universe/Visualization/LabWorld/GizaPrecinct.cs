@@ -290,6 +290,7 @@ namespace RealityEngine.Visualization
             GizaField.EnsureAnkhhaf(pose);
             GizaField.EnsureKawab(pose);
             GizaField.EnsureIdu(pose);
+            GizaField.EnsureQar(pose);
             GizaField.EnsureKhufukhaf(pose);
             GizaField.EnsureHordjedef(pose);
             GizaField.EnsureMeresankh(pose);
