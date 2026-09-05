@@ -10,6 +10,7 @@ namespace RealityEngine.Visualization
     /// Hemiunu (G 4000) elite mastaba in the West Field (Khufu's vizier; Lehner schematic),
     /// Senedjemib Inti (G 2370) elite mastaba complex in the NW West Field (Lehner schematic),
     /// Babaef / Khnumbaf (G 5230) elite mastaba in the central West Field (Lehner / Reisner schematic),
+    /// Duaenre (G 5110) elite mastaba in the southern West Field (son of Khafre; Lehner / Reisner schematic),
     /// Ankhhaf (G 7510) elite mastaba in the East Field (Lehner schematic),
     /// Meresankh III (G 7530-7540) elite double mastaba + rock-cut chapel south of Ankhhaf (Lehner / Reisner),
     /// Kawab (G 7110-7120) elite double mastaba between Meresankh and Ankhhaf in the East Field (Lehner / Reisner),
@@ -43,6 +44,7 @@ namespace RealityEngine.Visualization
         public const string HemiunuName = "Hemiunu";
         public const string SenedjemibName = "Senedjemib";
         public const string BabaefName = "Babaef";
+        public const string DuaenreName = "Duaenre";
         public const string AnkhhafName = "Ankhhaf";
         public const string MeresankhName = "Meresankh";
         public const string KawabName = "Kawab";
@@ -129,6 +131,20 @@ namespace RealityEngine.Visualization
         public const float BabaefChapelEW = 9.5f;
         public const float BabaefChapelNS = 6.8f;
         public const float BabaefChapelHM = 4.3f;
+
+        // Duaenre (G 5110): southern West Field elite mastaba (son of Khafre; Lehner / Reisner).
+        // South of Babaef strip; east offering chapel schematic.
+        public const float DuaenreEastInsetFromWestEastEdgeM = 52f;
+        public const float DuaenreNorthFrac = 0.26f;
+        public const float DuaenreBodyEW = 34.0f;
+        public const float DuaenreBodyNS = 19.5f;
+        public const float DuaenreBodyHM = 8.8f;
+        public const float DuaenreUpperEW = 31.0f;
+        public const float DuaenreUpperNS = 17.5f;
+        public const float DuaenreUpperHM = 1.05f;
+        public const float DuaenreChapelEW = 10.0f;
+        public const float DuaenreChapelNS = 7.0f;
+        public const float DuaenreChapelHM = 4.4f;
 
         // Ankhhaf (G 7510): oversized East Field elite mastaba (Khafre's vizier; Lehner schematic).
         // Northern East Field, closer to Khufu east apron than the dense street grid.
@@ -352,6 +368,10 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, babEast, babNorth,
                 BabaefBodyEW * 0.5f + BabaefChapelEW + 14f, BabaefBodyNS * 0.5f + 12f);
 
+            LayoutDuaenre(out float duaEast, out float duaNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, duaEast, duaNorth,
+                DuaenreBodyEW * 0.5f + DuaenreChapelEW + 14f, DuaenreBodyNS * 0.5f + 12f);
+
             LayoutAnkhhaf(out float aEast, out float aNorth);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, aEast, aNorth,
                 AnkhhafBodyEW * 0.5f + AnkhhafChapelEW + 16f, AnkhhafBodyNS * 0.5f + 12f);
@@ -444,6 +464,7 @@ namespace RealityEngine.Visualization
             DestroyNamed(GizaComplex.FindNamed(HemiunuName));
             DestroyNamed(GizaComplex.FindNamed(SenedjemibName));
             DestroyNamed(GizaComplex.FindNamed(BabaefName));
+            DestroyNamed(GizaComplex.FindNamed(DuaenreName));
             DestroyNamed(GizaComplex.FindNamed(AnkhhafName));
             DestroyNamed(GizaComplex.FindNamed(MeresankhName));
             DestroyNamed(GizaComplex.FindNamed(KawabName));
@@ -504,6 +525,14 @@ namespace RealityEngine.Visualization
             if (old != null && old.transform.Find(BabaefName + MassingMarker) == null)
                 DestroyNamed(old);
             Ensure(BabaefName, pose, BuildBabaef, pose.surfaceY, true);
+        }
+
+        public static void EnsureDuaenre(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(DuaenreName);
+            if (old != null && old.transform.Find(DuaenreName + MassingMarker) == null)
+                DestroyNamed(old);
+            Ensure(DuaenreName, pose, BuildDuaenre, pose.surfaceY, true);
         }
 
         public static void EnsureAnkhhaf(GizaComplex.Pose pose)
@@ -731,6 +760,14 @@ namespace RealityEngine.Visualization
             // G 5230 central West Field: south of Hemiunu, slightly deeper west (Lehner / Reisner).
             east = east1 - BabaefEastInsetFromWestEastEdgeM;
             north = north0 + (north1 - north0) * BabaefNorthFrac;
+        }
+
+        static void LayoutDuaenre(out float east, out float north)
+        {
+            LayoutWest(out float east0, out float east1, out float north0, out float north1);
+            // G 5110 southern West Field: south of Babaef strip (Lehner / Reisner).
+            east = east1 - DuaenreEastInsetFromWestEastEdgeM;
+            north = north0 + (north1 - north0) * DuaenreNorthFrac;
         }
 
         static void LayoutAnkhhaf(out float east, out float north)
@@ -1604,6 +1641,121 @@ namespace RealityEngine.Visualization
                 "Source: published Giza mastaba corpus - not AI-invented text.";
             GizaBuild.HonestyPlate(root.transform, BabaefName + "_ChapelText", chapelText, 22f);
             Transform textPlate = root.transform.Find(BabaefName + "_ChapelText");
+            if (textPlate != null)
+            {
+                textPlate.localPosition = new Vector3(chapelX, 1.45f, -(chapelNS * 0.5f + 2.2f));
+                textPlate.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            }
+            return root;
+        }
+
+        static GameObject BuildDuaenre(GizaComplex.Pose pose)
+        {
+            LayoutDuaenre(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(DuaenreName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material mud = GizaBuild.Mudbrick();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+
+            float bodyEW = DuaenreBodyEW;
+            float bodyNS = DuaenreBodyNS;
+            float bodyH = DuaenreBodyHM;
+            float halfE = bodyEW * 0.5f;
+            float chapelEW = DuaenreChapelEW;
+            float chapelNS = DuaenreChapelNS;
+            float chapelH = DuaenreChapelHM;
+
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3(chapelEW * 0.35f, 0.06f, 0f),
+                new Vector3(bodyEW + chapelEW + 16f, 0.12f, bodyNS + 14f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DuaenreName + "_Apron",
+                apron.Build(DuaenreName + "_Apron"), sand, true);
+
+            var body = new LabMeshBuilder(8, 12);
+            body.AddBox(new Vector3(0f, bodyH * 0.5f, 0f), new Vector3(bodyEW, bodyH, bodyNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DuaenreName + "_Body",
+                body.Build(DuaenreName + "_Body"), lime, true);
+
+            var cornice = new LabMeshBuilder(8, 12);
+            cornice.AddBox(new Vector3(0f, bodyH + DuaenreUpperHM * 0.5f, 0f),
+                new Vector3(DuaenreUpperEW, DuaenreUpperHM, DuaenreUpperNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DuaenreName + "_Cornice",
+                cornice.Build(DuaenreName + "_Cornice"), mud, true);
+
+            float wallT = 0.75f;
+            float doorW = 2.6f;
+            float doorH = 3.0f;
+            float chapelX = halfE + chapelEW * 0.5f + 0.4f;
+            float floorT = 0.28f;
+            float deckY = 0f;
+
+            var chapelShell = new LabMeshBuilder(64, 96);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + floorT * 0.5f, 0f),
+                new Vector3(chapelEW, floorT, chapelNS), Color.white);
+            float wallY = deckY + chapelH * 0.5f;
+            chapelShell.AddBox(new Vector3(chapelX, wallY, chapelNS * 0.5f - wallT * 0.5f),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, wallY, -(chapelNS * 0.5f - wallT * 0.5f)),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            float wing = (chapelNS - doorW) * 0.5f;
+            float westX = chapelX - chapelEW * 0.5f + wallT * 0.5f;
+            if (wing > 0.35f)
+            {
+                chapelShell.AddBox(new Vector3(westX, wallY, doorW * 0.5f + wing * 0.5f),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+                chapelShell.AddBox(new Vector3(westX, wallY, -(doorW * 0.5f + wing * 0.5f)),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+            }
+            float lintelH = Mathf.Max(0.7f, chapelH - doorH);
+            chapelShell.AddBox(new Vector3(westX, deckY + doorH + lintelH * 0.5f, 0f),
+                new Vector3(wallT * 1.1f, lintelH, doorW + 0.9f), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + chapelH + 0.16f, 0f),
+                new Vector3(chapelEW + 0.3f, 0.32f, chapelNS + 0.3f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DuaenreName + "_Chapel",
+                chapelShell.Build(DuaenreName + "_Chapel"), lime, true);
+
+            var interior = new LabMeshBuilder(40, 60);
+            interior.AddRoom(new Vector3(chapelX, deckY + floorT + 1.7f, 0f),
+                new Vector3(chapelEW - wallT * 2f - 0.35f, 3.4f, chapelNS - wallT * 2f - 0.5f),
+                Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, DuaenreName + "_ChapelInterior",
+                interior.Build(DuaenreName + "_ChapelInterior"), lime, true);
+
+            var corridor = new LabMeshBuilder(16, 24);
+            float gap = chapelX - chapelEW * 0.5f - halfE;
+            float corrLen = Mathf.Max(1.2f, gap + 0.6f);
+            corridor.AddBox(new Vector3(halfE + corrLen * 0.5f, deckY + 0.1f, 0f),
+                new Vector3(corrLen, 0.2f, doorW + 1.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DuaenreName + "_Corridor",
+                corridor.Build(DuaenreName + "_Corridor"), pav, true);
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, DuaenreName + MassingMarker,
+                mark.Build(DuaenreName + MassingMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Duaenre (G 5110). Son of Khafre - Western Cemetery elite mastaba.\n" +
+                "Lehner / Reisner schematic massing (~34 x 19.5 x 8.8 m limestone body + cornice, east offering chapel).\n" +
+                "Not photogrammetry. Not proven interior chambers beyond the schematic chapel.";
+            GizaBuild.HonestyPlate(root.transform, DuaenreName + "_Honesty", honesty, 26f);
+            Transform plate = root.transform.Find(DuaenreName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(halfE + chapelEW + 3.5f, 1.6f, chapelNS * 0.5f + 2.5f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+
+            const string chapelText =
+                "Name plate, Latin transliteration only - Reisner / Lehner Giza corpus:\n" +
+                "dwA-n-ra (Duaenre). King's son; G 5110 Western Cemetery.\n" +
+                "No invented hieroglyph glyphs (TMP lacks Egyptian font).\n" +
+                "Source: published Giza mastaba corpus - not AI-invented text.";
+            GizaBuild.HonestyPlate(root.transform, DuaenreName + "_ChapelText", chapelText, 22f);
+            Transform textPlate = root.transform.Find(DuaenreName + "_ChapelText");
             if (textPlate != null)
             {
                 textPlate.localPosition = new Vector3(chapelX, 1.45f, -(chapelNS * 0.5f + 2.2f));
