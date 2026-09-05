@@ -288,6 +288,7 @@ namespace RealityEngine.Visualization
             GizaField.EnsureBabaef(pose);
             GizaField.EnsureDuaenre(pose);
             GizaField.EnsureSeshemnefer(pose);
+            GizaField.EnsureKanefer(pose);
             GizaField.EnsureCemeteryEnEchelon(pose);
             GizaField.EnsureEastField(pose);
             GizaField.EnsureAnkhhaf(pose);
