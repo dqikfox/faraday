@@ -196,6 +196,7 @@ namespace RealityEngine.Visualization
                 || lower.Contains("qar") || lower.Contains("g7101")
                 || lower.Contains("khufukhaf") || lower.Contains("g7130") || lower.Contains("g7140")
                 || lower.Contains("hordjedef") || lower.Contains("djedefhor") || lower.Contains("g7210") || lower.Contains("g7220")
+                || lower.Contains("minkhaf") || lower.Contains("g7430") || lower.Contains("g7440")
                 || lower.Contains("hetepheres") || lower.Contains("g7000x")
                 || lower.Contains("debehen") || lower.Contains("menkaurequarry")
                 || lower.Contains("gizasurveyanomalies") || lower.Contains("surveyanomal")
@@ -757,6 +758,7 @@ namespace RealityEngine.Visualization
             SitFound("Qar", top);
             SitFound("Khufukhaf", top);
             SitFound("Hordjedef", top);
+            SitFound("Minkhaf", top);
             SitFound("Hetepheres", top);
             SitFound("Debehen", terrace);
             SitFound("MenkaureQuarry", top);
