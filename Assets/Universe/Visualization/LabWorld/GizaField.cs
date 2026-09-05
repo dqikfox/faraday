@@ -44,6 +44,7 @@ namespace RealityEngine.Visualization
         public const string KawabName = "Kawab";
         public const string IduName = "Idu";
         public const string KhufukhafName = "Khufukhaf";
+        public const string HordjedefName = "Hordjedef";
         public const string HetepheresName = "Hetepheres";
         public const string DebehenName = "Debehen";
         public const string MenkaureQuarryName = "MenkaureQuarry";
@@ -180,6 +181,20 @@ namespace RealityEngine.Visualization
         public const float KhufukhafChapelNS = 6.8f;
         public const float KhufukhafChapelHM = 4.4f;
 
+        // Hordjedef / Djedefhor (G 7210-7220): East Field elite double mastaba east of Khufukhaf (Lehner / Reisner).
+        // Son of Khufu; N-S twin body G7210/G7220; east offering chapel schematic.
+        public const float HordjedefWestInsetFromEastWestEdgeM = 58f;
+        public const float HordjedefNorthFrac = 0.50f;
+        public const float HordjedefBodyEW = 18.5f;
+        public const float HordjedefBodyNS = 37.0f;
+        public const float HordjedefBodyHM = 7.4f;
+        public const float HordjedefUpperEW = 16.2f;
+        public const float HordjedefUpperNS = 34.0f;
+        public const float HordjedefUpperHM = 1.0f;
+        public const float HordjedefChapelEW = 9.0f;
+        public const float HordjedefChapelNS = 6.4f;
+        public const float HordjedefChapelHM = 4.2f;
+
         // Hetepheres I (G 7000X): SE of Khufu, between east face and queens G1a (Reisner / Lehner).
         // Vertical rock-cut shaft ~2.1-2.5 m square, ~27 m deep; empty alabaster sarcophagus chamber.
         public const float HetepheresEastPastHalfM = 34f;
@@ -306,6 +321,10 @@ namespace RealityEngine.Visualization
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, khfEast, khfNorth,
                 KhufukhafBodyEW * 0.5f + KhufukhafChapelEW + 16f, KhufukhafBodyNS * 0.5f + 12f);
 
+            LayoutHordjedef(out float hjdEast, out float hjdNorth);
+            Enc(ref xMin, ref xMax, ref zMin, ref zMax, hjdEast, hjdNorth,
+                HordjedefBodyEW * 0.5f + HordjedefChapelEW + 16f, HordjedefBodyNS * 0.5f + 12f);
+
             LayoutHetepheres(out float hetEast, out float hetNorth);
             Enc(ref xMin, ref xMax, ref zMin, ref zMax, hetEast, hetNorth,
                 HetepheresShaftWidthM * 0.5f + 12f, HetepheresShaftWidthM * 0.5f + 12f);
@@ -370,6 +389,7 @@ namespace RealityEngine.Visualization
             DestroyNamed(GizaComplex.FindNamed(KawabName));
             DestroyNamed(GizaComplex.FindNamed(IduName));
             DestroyNamed(GizaComplex.FindNamed(KhufukhafName));
+            DestroyNamed(GizaComplex.FindNamed(HordjedefName));
             DestroyNamed(GizaComplex.FindNamed(HetepheresName));
             DestroyNamed(GizaComplex.FindNamed(DebehenName));
             DestroyNamed(GizaComplex.FindNamed(MenkaureQuarryName));
@@ -454,6 +474,14 @@ namespace RealityEngine.Visualization
             if (old != null && old.transform.Find(KhufukhafName + MassingMarker) == null)
                 DestroyNamed(old);
             Ensure(KhufukhafName, pose, BuildKhufukhaf, pose.surfaceY, true);
+        }
+
+        public static void EnsureHordjedef(GizaComplex.Pose pose)
+        {
+            GameObject old = GizaComplex.FindNamed(HordjedefName);
+            if (old != null && old.transform.Find(HordjedefName + MassingMarker) == null)
+                DestroyNamed(old);
+            Ensure(HordjedefName, pose, BuildHordjedef, pose.surfaceY, true);
         }
 
         public static void EnsureHetepheres(GizaComplex.Pose pose)
@@ -649,6 +677,14 @@ namespace RealityEngine.Visualization
             // G 7130-7140 east of Kawab strip (Lehner / Reisner Eastern Cemetery).
             east = east0 + KhufukhafWestInsetFromEastWestEdgeM + KhufukhafBodyEW * 0.5f;
             north = north0 + (north1 - north0) * KhufukhafNorthFrac;
+        }
+
+        static void LayoutHordjedef(out float east, out float north)
+        {
+            LayoutEast(out float east0, out float east1, out float north0, out float north1);
+            // G 7210-7220 further east of Khufukhaf strip (Lehner / Reisner Eastern Cemetery).
+            east = east0 + HordjedefWestInsetFromEastWestEdgeM + HordjedefBodyEW * 0.5f;
+            north = north0 + (north1 - north0) * HordjedefNorthFrac;
         }
 
         static void LayoutHetepheres(out float east, out float north)
@@ -2115,6 +2151,130 @@ namespace RealityEngine.Visualization
                 "Source: published Giza mastaba corpus — not AI-invented text.";
             GizaBuild.HonestyPlate(root.transform, KhufukhafName + "_ChapelText", chapelText, 22f);
             Transform textPlate = root.transform.Find(KhufukhafName + "_ChapelText");
+            if (textPlate != null)
+            {
+                textPlate.localPosition = new Vector3(chapelX, 1.45f, -(chapelNS * 0.5f + 2.2f));
+                textPlate.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            }
+            return root;
+        }
+
+
+        static GameObject BuildHordjedef(GizaComplex.Pose pose)
+        {
+            LayoutHordjedef(out float east, out float north);
+            Vector3 world = GizaComplex.WorldFromKhufu(pose, east, north, 0f);
+            GameObject root = GizaBuild.Root(HordjedefName, pose.parent, world, pose.rot);
+            Material lime = GizaBuild.InteriorLime();
+            Material mud = GizaBuild.Mudbrick();
+            Material sand = GizaBuild.DesertSand();
+            Material pav = GizaBuild.Pavement();
+
+            float bodyEW = HordjedefBodyEW;
+            float bodyNS = HordjedefBodyNS;
+            float bodyH = HordjedefBodyHM;
+            float halfE = bodyEW * 0.5f;
+            float halfN = bodyNS * 0.5f;
+            float chapelEW = HordjedefChapelEW;
+            float chapelNS = HordjedefChapelNS;
+            float chapelH = HordjedefChapelHM;
+
+            var apron = new LabMeshBuilder(8, 12);
+            apron.AddBox(new Vector3(chapelEW * 0.35f, 0.06f, 0f),
+                new Vector3(bodyEW + chapelEW + 18f, 0.12f, bodyNS + 16f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HordjedefName + "_Apron",
+                apron.Build(HordjedefName + "_Apron"), sand, true);
+
+            // N-S double mastaba: two limestone lobes + mid seam (G 7210 / G 7220 schematic).
+            float lobeNS = bodyNS * 0.48f;
+            float lobeGap = bodyNS * 0.02f;
+            var body = new LabMeshBuilder(24, 36);
+            body.AddBox(new Vector3(0f, bodyH * 0.5f, halfN * 0.5f + lobeGap * 0.25f),
+                new Vector3(bodyEW, bodyH, lobeNS), Color.white);
+            body.AddBox(new Vector3(0f, bodyH * 0.5f, -(halfN * 0.5f + lobeGap * 0.25f)),
+                new Vector3(bodyEW, bodyH, lobeNS), Color.white);
+            body.AddBox(new Vector3(0f, bodyH * 0.42f, 0f),
+                new Vector3(bodyEW * 0.92f, bodyH * 0.55f, bodyNS * 0.08f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HordjedefName + "_Body",
+                body.Build(HordjedefName + "_Body"), lime, true);
+
+            var cornice = new LabMeshBuilder(8, 12);
+            cornice.AddBox(new Vector3(0f, bodyH + HordjedefUpperHM * 0.5f, 0f),
+                new Vector3(HordjedefUpperEW, HordjedefUpperHM, HordjedefUpperNS), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HordjedefName + "_Cornice",
+                cornice.Build(HordjedefName + "_Cornice"), mud, true);
+
+            float wallT = 0.75f;
+            float doorW = 2.5f;
+            float doorH = 2.85f;
+            float chapelX = halfE + chapelEW * 0.5f + 0.5f;
+            float floorT = 0.28f;
+            float deckY = 0f;
+            var chapelShell = new LabMeshBuilder(64, 96);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + floorT * 0.5f, 0f),
+                new Vector3(chapelEW, floorT, chapelNS), Color.white);
+            float wallY = deckY + chapelH * 0.5f;
+            chapelShell.AddBox(new Vector3(chapelX, wallY, chapelNS * 0.5f - wallT * 0.5f),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, wallY, -(chapelNS * 0.5f - wallT * 0.5f)),
+                new Vector3(chapelEW, chapelH, wallT), Color.white);
+            float wing = (chapelNS - doorW) * 0.5f;
+            float westX = chapelX - chapelEW * 0.5f + wallT * 0.5f;
+            if (wing > 0.35f)
+            {
+                chapelShell.AddBox(new Vector3(westX, wallY, doorW * 0.5f + wing * 0.5f),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+                chapelShell.AddBox(new Vector3(westX, wallY, -(doorW * 0.5f + wing * 0.5f)),
+                    new Vector3(wallT, chapelH, wing), Color.white);
+            }
+            float lintelH = Mathf.Max(0.7f, chapelH - doorH);
+            chapelShell.AddBox(new Vector3(westX, deckY + doorH + lintelH * 0.5f, 0f),
+                new Vector3(wallT * 1.1f, lintelH, doorW + 0.9f), Color.white);
+            chapelShell.AddBox(new Vector3(chapelX, deckY + chapelH + 0.16f, 0f),
+                new Vector3(chapelEW + 0.3f, 0.32f, chapelNS + 0.3f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HordjedefName + "_Chapel",
+                chapelShell.Build(HordjedefName + "_Chapel"), lime, true);
+
+            var interior = new LabMeshBuilder(40, 60);
+            interior.AddRoom(new Vector3(chapelX, deckY + floorT + 1.65f, 0f),
+                new Vector3(chapelEW - wallT * 2f - 0.35f, 3.3f, chapelNS - wallT * 2f - 0.5f),
+                Color.white, false, false, true, true);
+            GizaBuild.SpawnMesh(root.transform, HordjedefName + "_ChapelInterior",
+                interior.Build(HordjedefName + "_ChapelInterior"), lime, true);
+
+            var corridor = new LabMeshBuilder(16, 24);
+            float gap = chapelX - chapelEW * 0.5f - halfE;
+            float corrLen = Mathf.Max(1.2f, gap + 0.6f);
+            corridor.AddBox(new Vector3(halfE + corrLen * 0.5f, deckY + 0.1f, 0f),
+                new Vector3(corrLen, 0.2f, doorW + 1.4f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HordjedefName + "_Corridor",
+                corridor.Build(HordjedefName + "_Corridor"), pav, true);
+
+            var mark = new LabMeshBuilder(8, 12);
+            mark.AddBox(new Vector3(0f, 0.12f, 0f), new Vector3(0.5f, 0.24f, 0.5f), Color.white);
+            GizaBuild.SpawnMesh(root.transform, HordjedefName + MassingMarker,
+                mark.Build(HordjedefName + MassingMarker), pav, false);
+
+            const string honesty =
+                GizaComplex.HonestyPrefix + "\n" +
+                "Hordjedef / Djedefhor (G 7210-7220). Son of Khufu - Eastern Cemetery elite double mastaba.\n" +
+                "Lehner / Reisner schematic massing (~18.5 x 37 x 7.4 m N-S twin body + cornice, east offering chapel).\n" +
+                "Not photogrammetry. Not proven chambers beyond the schematic chapel.";
+            GizaBuild.HonestyPlate(root.transform, HordjedefName + "_Honesty", honesty, 28f);
+            Transform plate = root.transform.Find(HordjedefName + "_Honesty");
+            if (plate != null)
+            {
+                plate.localPosition = new Vector3(halfE + chapelEW + 3.5f, 1.6f, chapelNS * 0.5f + 2.5f);
+                plate.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            }
+
+            const string chapelText =
+                "Name plate, Latin transliteration only - Reisner / Lehner Giza corpus:\n" +
+                "Hr-Dd.f / Dd.f-Hr (Hordjedef / Djedefhor). Son of Khufu; G 7210-7220 Eastern Cemetery.\n" +
+                "No invented hieroglyph glyphs (TMP lacks Egyptian font).\n" +
+                "Source: published Giza mastaba corpus - not AI-invented text.";
+            GizaBuild.HonestyPlate(root.transform, HordjedefName + "_ChapelText", chapelText, 22f);
+            Transform textPlate = root.transform.Find(HordjedefName + "_ChapelText");
             if (textPlate != null)
             {
                 textPlate.localPosition = new Vector3(chapelX, 1.45f, -(chapelNS * 0.5f + 2.2f));
